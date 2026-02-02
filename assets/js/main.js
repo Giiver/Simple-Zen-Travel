@@ -30,18 +30,70 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function handleScroll() {
         if (window.scrollY > 100) {
-            header.classList.add('scrolled');
-        } else {
-            header.classList.remove('scrolled');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 100) {
+                    header.classList.add('header--scrolled');
+                    scrollTop.classList.add('visible');
+                } else {
+                    header.classList.remove('header--scrolled');
+                    scrollTop.classList.remove('visible');
+                }
+                
+                updateActiveNavLink();
+            });
         }
         
-        if (window.scrollY > 500) {
+        if (window.scrollY > 100) {
+            header.classList.add('header--scrolled');
             scrollTop.classList.add('visible');
         } else {
+            header.classList.remove('header--scrolled');
             scrollTop.classList.remove('visible');
         }
         
         updateActiveNavLink();
+    }
+    
+    // Stacked images slider
+    const stackedImages = document.querySelectorAll('.stacked-image');
+    if (stackedImages.length > 0) {
+        let currentPositions = [1, 2, 3]; // Track which image is in which position
+        
+        function rotateImages() {
+            // Add transitioning class for fade effect
+            stackedImages.forEach(img => {
+                img.classList.add('transitioning');
+            });
+            
+            // Wait for fade out, then change positions
+            setTimeout(() => {
+                // Rotate positions: 1->3, 2->1, 3->2
+                currentPositions = [currentPositions[2], currentPositions[0], currentPositions[1]];
+                
+                // Apply new classes based on positions
+                stackedImages.forEach((img, index) => {
+                    // Remove all position classes
+                    img.classList.remove('stacked-image--1', 'stacked-image--2', 'stacked-image--3');
+                    
+                    // Find which position this image should be in
+                    const positionIndex = currentPositions.indexOf(index + 1);
+                    const newPosition = positionIndex + 1;
+                    
+                    // Add the new position class
+                    img.classList.add(`stacked-image--${newPosition}`);
+                });
+                
+                // Remove transitioning class for fade in after position transition completes
+                setTimeout(() => {
+                    stackedImages.forEach(img => {
+                        img.classList.remove('transitioning');
+                    });
+                }, 800); // Match the CSS transition duration (0.8s)
+            }, 300);
+        }
+        
+        // Rotate images every 4 seconds
+        setInterval(rotateImages, 4000);
     }
     
     window.addEventListener('scroll', handleScroll);
@@ -86,37 +138,6 @@ document.addEventListener('DOMContentLoaded', function() {
     revealElements.forEach(el => {
         revealObserver.observe(el);
     });
-    
-    const monthlyAmountSlider = document.getElementById('monthly-amount');
-    const amountDisplay = document.getElementById('amount-display');
-    const turboMode = document.getElementById('turbo-mode');
-    const monthlyPointsDisplay = document.getElementById('monthly-points');
-    const yearlyPointsDisplay = document.getElementById('yearly-points');
-    
-    function updateSimulator() {
-        if (!monthlyAmountSlider) return;
-        
-        const amount = parseInt(monthlyAmountSlider.value);
-        const isTurbo = turboMode ? turboMode.checked : false;
-        const multiplier = isTurbo ? 2 : 1;
-        
-        const monthlyPoints = amount * multiplier;
-        const yearlyPoints = monthlyPoints * 12;
-        
-        if (amountDisplay) amountDisplay.textContent = amount + '€';
-        if (monthlyPointsDisplay) monthlyPointsDisplay.textContent = monthlyPoints.toLocaleString();
-        if (yearlyPointsDisplay) yearlyPointsDisplay.textContent = yearlyPoints.toLocaleString();
-    }
-    
-    if (monthlyAmountSlider) {
-        monthlyAmountSlider.addEventListener('input', updateSimulator);
-    }
-    
-    if (turboMode) {
-        turboMode.addEventListener('change', updateSimulator);
-    }
-    
-    updateSimulator();
     
     const contactForm = document.getElementById('contact-form');
     
