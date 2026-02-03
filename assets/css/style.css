@@ -66,6 +66,10 @@ img {
     display: block;
 }
 
+img[width][height] {
+    aspect-ratio: attr(width) / attr(height);
+}
+
 a {
     text-decoration: none;
     color: inherit;
