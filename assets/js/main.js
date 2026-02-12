@@ -54,46 +54,36 @@ document.addEventListener('DOMContentLoaded', function() {
         updateActiveNavLink();
     }
     
-    // Stacked images slider
-    const stackedImages = document.querySelectorAll('.stacked-image');
-    if (stackedImages.length > 0) {
-        let currentPositions = [1, 2, 3]; // Track which image is in which position
+    // Coverflow carousel
+    const coverflowItems = document.querySelectorAll('.coverflow__item');
+    if (coverflowItems.length > 0) {
+        const total = coverflowItems.length;
+        let activeIndex = 0;
         
-        function rotateImages() {
-            // Add transitioning class for fade effect
-            stackedImages.forEach(img => {
-                img.classList.add('transitioning');
+        function updateCoverflow() {
+            coverflowItems.forEach((item, i) => {
+                // Calculate shortest circular distance from active
+                let diff = i - activeIndex;
+                // Wrap around for circular effect
+                if (diff > total / 2) diff -= total;
+                if (diff < -total / 2) diff += total;
+                
+                if (diff >= -2 && diff <= 2) {
+                    item.setAttribute('data-pos', diff.toString());
+                } else {
+                    item.setAttribute('data-pos', 'hidden');
+                }
             });
-            
-            // Wait for fade out, then change positions
-            setTimeout(() => {
-                // Rotate positions: 1->3, 2->1, 3->2
-                currentPositions = [currentPositions[2], currentPositions[0], currentPositions[1]];
-                
-                // Apply new classes based on positions
-                stackedImages.forEach((img, index) => {
-                    // Remove all position classes
-                    img.classList.remove('stacked-image--1', 'stacked-image--2', 'stacked-image--3');
-                    
-                    // Find which position this image should be in
-                    const positionIndex = currentPositions.indexOf(index + 1);
-                    const newPosition = positionIndex + 1;
-                    
-                    // Add the new position class
-                    img.classList.add(`stacked-image--${newPosition}`);
-                });
-                
-                // Remove transitioning class for fade in after position transition completes
-                setTimeout(() => {
-                    stackedImages.forEach(img => {
-                        img.classList.remove('transitioning');
-                    });
-                }, 800); // Match the CSS transition duration (0.8s)
-            }, 300);
         }
         
-        // Rotate images every 4 seconds
-        setInterval(rotateImages, 4000);
+        // Initial layout
+        updateCoverflow();
+        
+        // Auto-advance every 3 seconds
+        setInterval(() => {
+            activeIndex = (activeIndex + 1) % total;
+            updateCoverflow();
+        }, 3000);
     }
     
     window.addEventListener('scroll', handleScroll);
