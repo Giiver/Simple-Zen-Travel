@@ -79,11 +79,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initial layout
         updateCoverflow();
         
-        // Auto-advance every 3 seconds
+        // Auto-advance every 2 seconds
         setInterval(() => {
             activeIndex = (activeIndex + 1) % total;
             updateCoverflow();
-        }, 3000);
+        }, 2000);
     }
     
     window.addEventListener('scroll', handleScroll);
